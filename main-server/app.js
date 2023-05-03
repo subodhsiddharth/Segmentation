@@ -57,15 +57,22 @@ app.get('/getNotes', (req,res) => {
 })
 
 app.delete('/deleteNote/:id', (req,res) => {
-    return axios.delete('http://localhost:3001/deleteNote/'+req.params.id)
-    .then( response => {
-        console.log(response.data)
-        res.status(200).json(response.data )
-    })
-    .catch(error => {
-        console.log(error)
-        res.status(400).json({error })
-    })
+    try{
+        var token = req.headers.authorization.split(' ')[1];
+        var oauth = jwt.verify(token, JWT_SECRET)
+
+        return axios.delete('http://localhost:3001/deleteNote/'+req.params.id)
+        .then( response => {
+            console.log(response.data)
+            res.status(200).json(response.data )
+        })
+        .catch(error => {
+            console.log(error)
+            res.status(400).json({error })
+        })
+    }catch(err) {
+        return res.status(401).send('Invalid token')
+    }
 })
 
 app.put('/updateNote/:id', (req,res) => {
